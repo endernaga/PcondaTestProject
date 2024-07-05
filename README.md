@@ -37,7 +37,7 @@ _Below is an example of how you can instruct your audience on installing and set
     python manage.py runserver
     ```
 
-5. open the web_interface/detail.html file in your browser
+5. open the **web_interface/detail.html** file in your browser
 
 
 
