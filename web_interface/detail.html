@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Detail</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Book Detail</h1>
+    <div id="book-detail">
+        <h2 id="title"></h2>
+        <p><strong>Author:</strong> <span id="author"></span></p>
+        <p><strong>Published Date:</strong> <span id="published_date"></span></p>
+        <p><strong>ISBN:</strong> <span id="isbn"></span></p>
+        <p><strong>Pages:</strong> <span id="pages"></span></p>
+    </div>
+
+    <div id="update-form">
+        <h2>Update Book</h2>
+        <form id="updateBookForm">
+            <input type="hidden" id="book-id">
+            <label for="title">Title:</label>
+            <input type="text" id="title-input" required>
+            <label for="author">Author:</label>
+            <input type="text" id="author-input" required>
+            <label for="isbn">ISBN:</label>
+            <input type="text" id="isbn-input" required>
+            <label for="pages">Pages:</label>
+            <input type="number" id="pages-input" required>
+            <button type="submit">Update Book</button>
+        </form>
+    </div>
+
+    <div id="delete-form">
+        <h2>Delete Book</h2>
+        <form id="deleteBookForm">
+            <button type="submit">Delete Book</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookId = urlParams.get('id');
+            const apiUrl = `http://127.0.0.1:8000/api/books/${bookId}/`;
+
+            const titleInput = document.getElementById("title-input");
+            const authorInput = document.getElementById("author-input");
+            const isbnInput = document.getElementById("isbn-input");
+            const pagesInput = document.getElementById("pages-input");
+
+            function loadBookDetail() {
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("title").textContent = data.title;
+                        document.getElementById("author").textContent = data.author;
+                        document.getElementById("published_date").textContent = data.published_date;
+                        document.getElementById("isbn").textContent = data.isbn;
+                        document.getElementById("pages").textContent = data.pages;
+
+                        titleInput.value = data.title;
+                        authorInput.value = data.author;
+                        isbnInput.value = data.isbn;
+                        pagesInput.value = data.pages;
+                    });
+            }
+
+            document.getElementById("updateBookForm").addEventListener("submit", function(event) {
+                event.preventDefault();
+
+                const updatedBook = {
+                    title: titleInput.value,
+                    author: authorInput.value,
+                    isbn: isbnInput.value,
+                    pages: pagesInput.value
+                };
+
+                fetch(apiUrl, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(updatedBook)
+                }).then(response => response.json())
+                  .then(data => {
+                      loadBookDetail();
+                  });
+            });
+
+            document.getElementById("deleteBookForm").addEventListener("submit", function(event) {
+                event.preventDefault();
+
+                fetch(apiUrl, {
+                    method: "DELETE"
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.href = "list.html";
+                    }
+                });
+            });
+
+            if (bookId) {
+                loadBookDetail();
+            }
+        });
+    </script>
+</body>
+</html>
